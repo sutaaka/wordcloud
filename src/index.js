@@ -1,10 +1,11 @@
-var server = require("./server");
-var router = require("./router");
-var requestHandlers = require("./requestHandlers");
+const Koa = require('koa');
+const app = new Koa();
+const jsonData = require('./person_train.json')
 
-var handle = {}
-handle["/"] = requestHandlers.start;
-handle["/start"] = requestHandlers.start;
-handle["/upload"] = requestHandlers.upload;
 
-server.start(router.route, handle);
+// response
+app.use(ctx => {
+  ctx.body = JSON.stringify(jsonData,undefined,1);
+});
+
+app.listen(3000);
