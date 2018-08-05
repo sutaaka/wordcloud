@@ -14,7 +14,7 @@ function start(response,postData ,jsonData) {
   keys[0] = jsonData.entry[0].Attributes.国籍[0]
     for(i=0;i<jsonLength;i++){ 
      for(j=0;j<k;j++){
-       if(JSON.stringify(jsonData.entry[i].Attributes.国籍[0]) === JSON.stringify(keys[j]) && jsonData.entry[i].Attributes.国籍 !== undefined){
+       if(Object.is(jsonData.entry[i].Attributes.国籍[0] ,keys[j]) && jsonData.entry[i].Attributes.国籍 !== undefined){
         console.log(j + "もと" + jsonData.entry[i].Attributes.国籍[0] + "keys" + keys[j])
          weight[j]=weight[j]+1
         l++
