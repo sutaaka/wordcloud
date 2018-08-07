@@ -1,4 +1,5 @@
 var querystring = require("querystring");
+const pug = require("pug");
 
 function start(response, postData, jsonData) {
   console.log("Request handler 'start' was called.");
@@ -14,12 +15,10 @@ function start(response, postData, jsonData) {
   for (i = 0; i < jsonLength; i++) {
     for (j = 0; j < k; j++) {
       if (
-        Object.is(jsonData.entry[i].Attributes.国籍[0], keys[j]) &&
+        jsonData.entry[i].Attributes.国籍[0] === keys[j] &&
         jsonData.entry[i].Attributes.国籍 !== undefined
       ) {
-        console.log(
-          j + "もと" + jsonData.entry[i].Attributes.国籍[0] + "keys" + keys[j]
-        );
+        //        console.log(j + "もと" + jsonData.entry[i].Attributes.国籍[0] + "keys" + keys[j])
         weight[j] = weight[j] + 1;
         l++;
       }
@@ -28,13 +27,26 @@ function start(response, postData, jsonData) {
       keys[k] = jsonData.entry[i].Attributes.国籍[0];
       k++;
     }
+    if (l === 0 && jsonData.entry[i].Attributes.国籍[0] !== undefined) {
+      keys[k] = jsonData.entry[i].Attributes.国籍[0];
+      k++;
+    }
     l = 0;
   }
 
-  for (i = 0; i < k; i++) {
-    weight[i] = weight[i] + 1;
-  }
+  const word_list = [
+    { text: "クラウド", weight: 19 },
+    { text: "IBM Bluemix", weight: 14, link: "http://bluemix.net/" },
+    { text: "マンホール", weight: 12, link: "http://manholemap.juge.me/" },
+    { text: "ねっぴ", weight: 9, link: "http://neppi.co/" },
+    {
+      text: "ツイートマッパー",
+      weight: 9,
+      link: "http://tweetsmapper.juge.me/"
+    }
+  ];
 
+  const wh = { width: 500, height: 200 };
   // var body = '<html>'+
   //   '<head>'+
   //   '<meta http-equiv="Content-Type" content="text/html; '+
@@ -47,6 +59,7 @@ function start(response, postData, jsonData) {
   //       '</form>'                            +
   //       '</body>'+
   //       '</html>';
+
   console.log(weight);
   response.writeHead(200, { "Content-Type": "text/plain;charset=utf-8" });
   response.write(JSON.stringify(keys, undefined, 1));
@@ -54,11 +67,14 @@ function start(response, postData, jsonData) {
 }
 
 function upload(response, postData, jsonData) {
-  console.log("Request handler 'upload' was called.");
-  response.writeHead(200, { "Content-Type": "text/plain;charset=utf-8" });
+  console.log(JSON.stringify(wh));
+  response.writeHead(200, { "Content-Type": "text/html;charset=utf-8" });
   response.write(
-    //"You've sent the text: "+
-    JSON.stringify(jsonData.entry[1].Attributes.人口, undefined, 1)
+    pug.renderFile("index.pug", {
+      pageTitle: "wordcloud",
+      word_list: JSON.stringify(word_list),
+      wh: JSON.stringify(wh)
+    })
   );
   response.end();
 }
