@@ -1,81 +1,56 @@
 var querystring = require("querystring");
 const pug = require("pug");
+// const jsonData = require("./person_train.json");
+
+function getWordList({ entry }) {
+  const contry = entry.reduce((accumulator, currentValue) => {
+    const name = currentValue.Attributes["国籍"][0];
+    const weight = (accumulator.get(name) || 0) + 1;
+    if (name) {
+      accumulator.set(name, weight);
+    }
+    return accumulator;
+  }, new Map());
+
+  return Array.from(contry.entries()).map(([text, weight], index) => {
+    return { text, weight, link: `http://localhost:8888?word=${text}` };
+  });
+}
 
 function start(response, postData, jsonData) {
   console.log("Request handler 'start' was called.");
-  var keys = [];
-  var jsonLength = jsonData.entry.length;
-  var weight = [];
-  for (i = 0; i < jsonLength; i++) {
-    weight[i] = 0;
-  }
-  var l = 0;
-  var k = 1;
-  keys[0] = jsonData.entry[0].Attributes.国籍[0];
-  for (i = 0; i < jsonLength; i++) {
-    for (j = 0; j < k; j++) {
-      if (
-        jsonData.entry[i].Attributes.国籍[0] === keys[j] &&
-        jsonData.entry[i].Attributes.国籍 !== undefined
-      ) {
-        //        console.log(j + "もと" + jsonData.entry[i].Attributes.国籍[0] + "keys" + keys[j])
-        weight[j] = weight[j] + 1;
-        l++;
-      }
-    }
-    if (l === 0 && jsonData.entry[i].Attributes.国籍[0] !== undefined) {
-      keys[k] = jsonData.entry[i].Attributes.国籍[0];
-      k++;
-    }
-    if (l === 0 && jsonData.entry[i].Attributes.国籍[0] !== undefined) {
-      keys[k] = jsonData.entry[i].Attributes.国籍[0];
-      k++;
-    }
-    l = 0;
-  }
 
-  const word_list = [
-    { text: "クラウド", weight: 19 },
-    { text: "IBM Bluemix", weight: 14, link: "http://bluemix.net/" },
-    { text: "マンホール", weight: 12, link: "http://manholemap.juge.me/" },
-    { text: "ねっぴ", weight: 9, link: "http://neppi.co/" },
-    {
-      text: "ツイートマッパー",
-      weight: 9,
-      link: "http://tweetsmapper.juge.me/"
-    }
-  ];
+  response.writeHead(200, { "Content-Type": "text/html;charset=utf-8" });
+  response.write(
+    pug.renderFile("index.pug", {
+      pageTitle: "wordcloud",
+      word_list: JSON.stringify(getWordList(jsonData)),
+      wh: JSON.stringify({
+        classPattern: null,
+        colors: [
+          "#800026",
+          "#bd0026",
+          "#e31a1c",
+          "#fc4e2a",
+          "#fd8d3c",
+          "#feb24c",
+          "#fed976",
+          "#ffeda0",
+          "#ffffcc"
+        ],
+        width: 2000,
+        height: 1000,
+        autoResize: true,
+        fontSize: { from: 0.1, to: 0.02 }
+      })
+    })
+  );
 
-  const wh = { width: 500, height: 200 };
-  // var body = '<html>'+
-  //   '<head>'+
-  //   '<meta http-equiv="Content-Type" content="text/html; '+
-  //       'charset=UTF-8" />'+
-  //       '</head>'+
-  //       '<body>'+
-  //       '<form action="/upload" method="post">'+
-  //       '<textarea name="text" rows="20" cols="60"></textarea>'+
-  //       '<input type="submit" value="Submit text" />'+
-  //       '</form>'                            +
-  //       '</body>'+
-  //       '</html>';
-
-  console.log(weight);
-  response.writeHead(200, { "Content-Type": "text/plain;charset=utf-8" });
-  response.write(JSON.stringify(keys, undefined, 1));
   response.end();
 }
 
 function upload(response, postData, jsonData) {
   console.log(JSON.stringify(wh));
-  response.writeHead(200, { "Content-Type": "text/html;charset=utf-8" });
-  response.write(
-    pug.renderFile("index.pug", {
-      pageTitle: "wordcloud",
-      word_list: JSON.stringify(word_list),
-      wh: JSON.stringify(wh)
-    })
-  );
   response.end();
 }
 
