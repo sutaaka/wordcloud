@@ -1,36 +1,39 @@
 var querystring = require("querystring");
 
-
-function start(response,postData ,jsonData) {
+function start(response, postData, jsonData) {
   console.log("Request handler 'start' was called.");
-  var keys = []
-  var jsonLength = jsonData.entry.length
-  var weight = []
-  for(i=0;i<jsonLength;i++){
-    weight[i] = 0
+  var keys = [];
+  var jsonLength = jsonData.entry.length;
+  var weight = [];
+  for (i = 0; i < jsonLength; i++) {
+    weight[i] = 0;
   }
-  var  l = 0
-  var  k = 1
-  keys[0] = jsonData.entry[0].Attributes.国籍[0]
-    for(i=0;i<jsonLength;i++){ 
-     for(j=0;j<k;j++){
-       if(Object.is(jsonData.entry[i].Attributes.国籍[0] ,keys[j]) && jsonData.entry[i].Attributes.国籍 !== undefined){
-        console.log(j + "もと" + jsonData.entry[i].Attributes.国籍[0] + "keys" + keys[j])
-         weight[j]=weight[j]+1
-        l++
-       }
+  var l = 0;
+  var k = 1;
+  keys[0] = jsonData.entry[0].Attributes.国籍[0];
+  for (i = 0; i < jsonLength; i++) {
+    for (j = 0; j < k; j++) {
+      if (
+        Object.is(jsonData.entry[i].Attributes.国籍[0], keys[j]) &&
+        jsonData.entry[i].Attributes.国籍 !== undefined
+      ) {
+        console.log(
+          j + "もと" + jsonData.entry[i].Attributes.国籍[0] + "keys" + keys[j]
+        );
+        weight[j] = weight[j] + 1;
+        l++;
+      }
     }
-    if(l === 0 && jsonData.entry[i].Attributes.国籍[0] !== undefined){
-    keys[k] = jsonData.entry[i].Attributes.国籍[0]
-    k++
+    if (l === 0 && jsonData.entry[i].Attributes.国籍[0] !== undefined) {
+      keys[k] = jsonData.entry[i].Attributes.国籍[0];
+      k++;
     }
-    l = 0
-    }
-    
-  for(i=0;i<k;i++){
-    weight[i] = weight[i] + 1
+    l = 0;
   }
 
+  for (i = 0; i < k; i++) {
+    weight[i] = weight[i] + 1;
+  }
 
   // var body = '<html>'+
   //   '<head>'+
@@ -44,17 +47,19 @@ function start(response,postData ,jsonData) {
   //       '</form>'                            +
   //       '</body>'+
   //       '</html>';
-  console.log(weight)
-      response.writeHead(200, {"Content-Type": "text/plain;charset=utf-8"});
-      response.write(JSON.stringify(keys,undefined,1));
-      response.end();
+  console.log(weight);
+  response.writeHead(200, { "Content-Type": "text/plain;charset=utf-8" });
+  response.write(JSON.stringify(keys, undefined, 1));
+  response.end();
 }
 
-function upload(response,postData ,jsonData) {
+function upload(response, postData, jsonData) {
   console.log("Request handler 'upload' was called.");
-  response.writeHead(200, {"Content-Type": "text/plain;charset=utf-8"});
-  response.write(//"You've sent the text: "+
-    JSON.stringify(jsonData.entry[1].Attributes.人口,undefined,1));
+  response.writeHead(200, { "Content-Type": "text/plain;charset=utf-8" });
+  response.write(
+    //"You've sent the text: "+
+    JSON.stringify(jsonData.entry[1].Attributes.人口, undefined, 1)
+  );
   response.end();
 }
 
